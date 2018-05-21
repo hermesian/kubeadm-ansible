@@ -2,7 +2,7 @@
 
 - name: Deploy kubernetes dashboard into cluster
   when: init_cluster and started_kubelet and enable_dashboard
-  command: |
+  raw: |
     kubectl --kubeconfig={{ kubeadmin_config }} \
         apply -f https://raw.githubusercontent.com/kubernetes/dashboard/master/src/deploy/recommended/kubernetes-dashboard.yaml
   register: create_result

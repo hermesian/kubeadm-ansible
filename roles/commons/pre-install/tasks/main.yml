@@ -3,6 +3,36 @@
 - name: Install Kubernetes packages
   include_tasks: pkg.yml
 
+- name: Disable firewalld
+  service: name=firewalld state=stopped enabled=no
+
+- name: Permissive SELinux
+  shell: setenforce 0
+
+- name: Modify cgroup driver
+  lineinfile:
+    dest: /etc/systemd/system/kubelet.service.d/10-kubeadm.conf
+    regexp: 'Environment="KUBELET_CGROUP_ARGS=--cgroup-driver=systemd"'
+    line: 'Environment="KUBELET_CGROUP_ARGS=--cgroup-driver=cgroupfs"'
+
+- name: Copy and extract docker images for Kubernetes
+  unarchive:
+    src: docker_imgs.tar.gz
+    dest: /tmp
+
+- name: Find docker images
+  find:
+    paths: "/tmp/docker_imgs"
+    patterns: "*.tar"
+  register: docker_images_result
+
+- debug: msg="{{ item.path }}"
+  with_items: "{{ docker_images_result.files }}"
+
+- name: Load docker images
+  shell: docker load < "{{ item.path }}"
+  with_items: "{{ docker_images_result.files }}"
+
 - name: Disable system swap
   shell: "swapoff -a"
 

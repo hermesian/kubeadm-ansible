@@ -3,12 +3,18 @@
 - hosts: kube-cluster
   gather_facts: yes
   become: yes
+  environment:
+   http_proxy: "{{ lookup('env', 'http_proxy') }}"
+   https_proxy: "{{ lookup('env', 'http_proxy') }}"
   roles:
     - { role: docker, tags: docker }
 
 - hosts: master
   gather_facts: yes
   become: yes
+  environment:
+   http_proxy: "{{ lookup('env', 'http_proxy') }}"
+   https_proxy: "{{ lookup('env', 'http_proxy') }}"
   roles:
     - { role: kubernetes/master, tags: master }
     - { role: cni, tags: cni }
@@ -16,5 +22,8 @@
 - hosts: node
   gather_facts: yes
   become: yes
+  environment:
+   http_proxy: "{{ lookup('env', 'http_proxy') }}"
+   https_proxy: "{{ lookup('env', 'http_proxy') }}"
   roles:
     - { role: kubernetes/node, tags: node }

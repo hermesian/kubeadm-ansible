@@ -11,7 +11,7 @@
   template: src="{{ cni.template.ds }}.j2" dest={{ network_dir }}/{{ cni.template.ds }}
 
 - name: "Check {{ cni.name }} daemonset is working"
-  shell: |
+  raw: |
     kubectl --kubeconfig={{ kubeadmin_config }} \
             get ds --all-namespaces | grep {{ cni.name }}
   delegate_to: "{{ groups['master'][0] }}"
@@ -21,7 +21,7 @@
 
 - name: "Create {{ cni.name }} network daemonset"
   when: check_net|failed
-  shell: |
+  raw: |
     kubectl create --kubeconfig={{ kubeadmin_config }} \
                    -f {{ network_dir }}/{{ cni.template.ds }}
   delegate_to: "{{ groups['master'][0] }}"
